@@ -32,7 +32,7 @@ jobs:
           provenance: false
           tags: chenweiwen/${{env.APP_NAME}}:${{env.APP_VERSION}}-arm64
           build-args:
-            - URL=https://ghproxy.net/https://github.com/n42n/n3n/releases/download/${{env.APP_VERSION}}/n3n_${{env.APP_VERSION}}-1_arm64.deb
+            - "URL=https://ghproxy.net/https://github.com/n42n/n3n/releases/download/${{env.APP_VERSION}}/n3n_${{env.APP_VERSION}}-1_arm64.deb"
   docker-build-amd64:
     runs-on: ubuntu-latest
     container:
@@ -58,7 +58,7 @@ jobs:
           provenance: false
           tags: chenweiwen/${{env.APP_NAME}}:${{env.APP_VERSION}}-amd64
           build-args:
-            - URL=https://ghproxy.net/https://github.com/n42n/n3n/releases/download/${{env.APP_VERSION}}/n3n_${{env.APP_VERSION}}-1_amd64.deb
+            - "URL=https://ghproxy.net/https://github.com/n42n/n3n/releases/download/${{env.APP_VERSION}}/n3n_${{env.APP_VERSION}}-1_amd64.deb"
   manifest-images:
     needs: [docker-build-arm64, docker-build-amd64]
     runs-on: ubuntu-latest
