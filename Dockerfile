@@ -11,4 +11,6 @@ RUN wget ${URL} -O n2n.deb \
 
 COPY docker-start.sh /
 
+RUN chmod +x /docker-start.sh
+
 CMD ["/docker-start.sh"]
