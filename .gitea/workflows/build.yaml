@@ -1,11 +1,11 @@
-name: n3n-supernode-docker
+name: n3n-docker
 on:
   push:
     branches:
       - main
 env:
   APP_VERSION: 3.3.4
-  APP_NAME: n3n-supernode-docker
+  APP_NAME: n3n-docker
 jobs:
   docker-build-arm64:
     runs-on: ubuntu-latest
