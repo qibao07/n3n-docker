@@ -1,0 +1,78 @@
+name: n3n-supernode-docker
+on:
+  push:
+    branches:
+      - main
+env:
+  APP_VERSION: 3.3.4
+  APP_NAME: n3n-supernode-docker
+jobs:
+  docker-build-arm64:
+    runs-on: ubuntu-latest
+    container:
+      image: catthehacker/ubuntu:act-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: chenweiwen
+          password: ${{secrets.DOCKER_HUB_PASSWORD}}
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          platforms: linux/arm64
+          push: true
+          provenance: false
+          tags: chenweiwen/${{env.APP_NAME}}:${{env.APP_VERSION}}-arm64
+          build-args:
+            - URL=https://ghproxy.net/https://github.com/n42n/n3n/releases/download/${{env.APP_VERSION}}/n3n_${{env.APP_VERSION}}-1_arm64.deb
+  docker-build-amd64:
+    runs-on: ubuntu-latest
+    container:
+      image: catthehacker/ubuntu:act-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: chenweiwen
+          password: ${{secrets.DOCKER_HUB_PASSWORD}}
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          provenance: false
+          tags: chenweiwen/${{env.APP_NAME}}:${{env.APP_VERSION}}-amd64
+          build-args:
+            - URL=https://ghproxy.net/https://github.com/n42n/n3n/releases/download/${{env.APP_VERSION}}/n3n_${{env.APP_VERSION}}-1_amd64.deb
+  manifest-images:
+    needs: [docker-build-arm64, docker-build-amd64]
+    runs-on: ubuntu-latest
+    container:
+      image: catthehacker/ubuntu:act-latest
+    steps:
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: chenweiwen
+          password: ${{secrets.DOCKER_HUB_PASSWORD}}
+      - name: Create and push manifest imagess
+        uses: noelware/docker-manifest-action@master
+        with:
+          inputs: chenweiwen/${{env.APP_NAME}}:latest, chenweiwen/${{env.APP_NAME}}:${{env.APP_VERSION}}
+          images: chenweiwen/${{env.APP_NAME}}:${{env.APP_VERSION}}-arm64, chenweiwen/${{env.APP_NAME}}:${{env.APP_VERSION}}-amd64
+          push: true
