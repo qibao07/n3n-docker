@@ -8,7 +8,6 @@ env:
   APP_NAME: n3n-docker
 jobs:
   manifest-images:
-    needs: [docker-build-arm64, docker-build-amd64]
     runs-on: ubuntu-latest
     container:
       image: catthehacker/ubuntu:act-latest
