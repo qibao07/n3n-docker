@@ -18,9 +18,11 @@ jobs:
           username: chenweiwen
           password: ${{secrets.DOCKER_HUB_PASSWORD}}
       - name: Create and push manifest images
+        uses: noelware/docker-manifest-action@master
         env:
           HTTP_PROXY: ${{vars.CLASH_HTTP_PROXY}}
           HTTPS_PROXY: ${{vars.CLASH_HTTP_PROXY}}
-        run: |
-          docker manifest create chenweiwen/n3n-docker:latest chenweiwen/n3n-docker:3.4.1-arm64 chenweiwen/n3n-docker:3.4.1-amd64
-          docker manifest create chenweiwen/n3n-docker:3.4.1 chenweiwen/n3n-docker:3.4.1-arm64 chenweiwen/n3n-docker:3.4.1-amd64
+        with:
+          inputs: chenweiwen/${{env.APP_NAME}}:latest, chenweiwen/${{env.APP_NAME}}:${{env.APP_VERSION}}
+          images: chenweiwen/${{env.APP_NAME}}:${{env.APP_VERSION}}-arm64, chenweiwen/${{env.APP_NAME}}:${{env.APP_VERSION}}-amd64
+          push: true
