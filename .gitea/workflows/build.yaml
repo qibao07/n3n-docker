@@ -6,7 +6,6 @@ on:
 env:
   APP_VERSION: 3.4.1
   APP_NAME: n3n-docker
-  CLASH_HTTP_PROXY: 192.168.50.252:57223
 jobs:
   docker-build-arm64:
     runs-on: ubuntu-latest
