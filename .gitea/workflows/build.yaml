@@ -18,9 +18,8 @@ jobs:
           username: chenweiwen
           password: ${{secrets.DOCKER_HUB_PASSWORD}}
       - name: Create and push manifest images
-        env:
-          HTTP_PROXY: ${{vars.CLASH_HTTP_PROXY}}
-          HTTPS_PROXY: ${{vars.CLASH_HTTP_PROXY}}
         run: |
+          export HTTP_PROXY=${{vars.CLASH_HTTP_PROXY}}
+          export HTTPS_PROXY=${{vars.CLASH_HTTP_PROXY}}
           docker manifest create chenweiwen/n3n-docker:latest chenweiwen/n3n-docker:3.4.1-arm64 chenweiwen/n3n-docker:3.4.1-amd64
           docker manifest create chenweiwen/n3n-docker:3.4.1 chenweiwen/n3n-docker:3.4.1-arm64 chenweiwen/n3n-docker:3.4.1-amd64
