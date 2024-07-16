@@ -78,6 +78,9 @@ jobs:
           password: ${{secrets.DOCKER_HUB_PASSWORD}}
       - name: Create and push manifest imagess
         uses: noelware/docker-manifest-action@master
+        env:
+          HTTP_PROXY: ${{vars.CLASH_HTTP_PROXY}}
+          HTTPS_PROXY: ${{vars.CLASH_HTTP_PROXY}}
         with:
           inputs: chenweiwen/${{env.APP_NAME}}:latest, chenweiwen/${{env.APP_NAME}}:${{env.APP_VERSION}}
           images: chenweiwen/${{env.APP_NAME}}:${{env.APP_VERSION}}-arm64, chenweiwen/${{env.APP_NAME}}:${{env.APP_VERSION}}-amd64
