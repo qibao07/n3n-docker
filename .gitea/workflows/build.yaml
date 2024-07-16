@@ -4,7 +4,7 @@ on:
     branches:
       - main
 env:
-  APP_VERSION: 3.3.4
+  APP_VERSION: 3.4.1
   APP_NAME: n3n-docker
 jobs:
   docker-build-arm64:
