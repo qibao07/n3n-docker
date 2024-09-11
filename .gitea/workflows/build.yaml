@@ -8,6 +8,8 @@ env:
   APP_VERSION: 3.4.1
   APP_NAME: n3n-docker
   DOCKER_TAG: 3.4.1
+  HTTP_PROXY: ${{vars.CLASH_HTTP_PROXY}}
+  HTTPS_PROXY: ${{vars.CLASH_HTTP_PROXY}}
 jobs:
   docker-build-arm64:
     runs-on: ubuntu-latest
