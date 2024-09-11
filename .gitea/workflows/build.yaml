@@ -63,7 +63,7 @@ jobs:
 
   manifest-images:
     runs-on: ubuntu-latest
-	needs：
+	needs:
       - docker-build-arm64
       - docker-build-amd64
     container:
