@@ -63,6 +63,9 @@ jobs:
 
   manifest-images:
     runs-on: ubuntu-latest
+	needs：
+      - docker-build-arm64
+      - docker-build-amd64
     container:
       image: catthehacker/ubuntu:act-latest
     steps:
