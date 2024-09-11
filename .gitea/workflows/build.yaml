@@ -3,11 +3,13 @@ on:
   push:
     branches:
       - main
+      - dev
 env:
   APP_VERSION: 3.4.1
   APP_NAME: n3n-docker
+  DOCKER_TAG: test
 jobs:
-  docker-build-arm64:
+  docker-buildx:
     runs-on: ubuntu-latest
     container:
       image: catthehacker/ubuntu:act-latest
@@ -18,69 +20,39 @@ jobs:
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-        with:
-          driver-opts: |
-            env.http_proxy=${{vars.CLASH_HTTP_PROXY}}
-            env.https_proxy=${{vars.CLASH_HTTP_PROXY}}
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: chenweiwen
           password: ${{secrets.DOCKER_HUB_PASSWORD}}
-      - name: Build and push
+      - name: Build and push (arm64)
         uses: docker/build-push-action@v6
         with:
           context: .
           platforms: linux/arm64
           push: true
           provenance: false
-          tags: chenweiwen/${{env.APP_NAME}}:${{env.APP_VERSION}}-arm64
+          tags: chenweiwen/${{env.APP_NAME}}:${{env.DOCKER_TAG}}-arm64
           build-args: URL=https://ghproxy.net/https://github.com/n42n/n3n/releases/download/${{env.APP_VERSION}}/n3n_${{env.APP_VERSION}}-1_arm64.deb
-  docker-build-amd64:
-    runs-on: ubuntu-latest
-    container:
-      image: catthehacker/ubuntu:act-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-        with:
-          driver-opts: |
-            env.http_proxy=${{vars.CLASH_HTTP_PROXY}}
-            env.https_proxy=${{vars.CLASH_HTTP_PROXY}}
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: chenweiwen
-          password: ${{secrets.DOCKER_HUB_PASSWORD}}
-      - name: Build and push
+      - name: Build and push (amd64)
         uses: docker/build-push-action@v6
         with:
           context: .
           platforms: linux/amd64
           push: true
           provenance: false
-          tags: chenweiwen/${{env.APP_NAME}}:${{env.APP_VERSION}}-amd64
+          tags: chenweiwen/${{env.APP_NAME}}:${{env.DOCKER_TAG}}-amd64
           build-args: URL=https://ghproxy.net/https://github.com/n42n/n3n/releases/download/${{env.APP_VERSION}}/n3n_${{env.APP_VERSION}}-1_amd64.deb
-  manifest-images:
-    runs-on: ubuntu-latest
-    container:
-      image: catthehacker/ubuntu:act-latest
-    steps:
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: chenweiwen
-          password: ${{secrets.DOCKER_HUB_PASSWORD}}
       - name: Create and push manifest images
         uses: noelware/docker-manifest-action@master
-        env:
-          HTTP_PROXY: ${{vars.CLASH_HTTP_PROXY}}
-          HTTPS_PROXY: ${{vars.CLASH_HTTP_PROXY}}
         with:
-          inputs: chenweiwen/${{env.APP_NAME}}:latest, chenweiwen/${{env.APP_NAME}}:${{env.APP_VERSION}}
-          images: chenweiwen/${{env.APP_NAME}}:${{env.APP_VERSION}}-arm64, chenweiwen/${{env.APP_NAME}}:${{env.APP_VERSION}}-amd64
+          inputs: chenweiwen/${{env.APP_NAME}}:${{env.DOCKER_TAG}}
+          images: chenweiwen/${{env.APP_NAME}}:${{env.DOCKER_TAG}}-arm64, chenweiwen/${{env.APP_NAME}}:${{env.DOCKER_TAG}}-amd64
+          push: true
+      - name: Create and push manifest images (latest)
+        if: env.APP_VERSION == env.DOCKER_TAG
+        uses: noelware/docker-manifest-action@master
+        with:
+          inputs: chenweiwen/${{env.APP_NAME}}:latest
+          images: chenweiwen/${{env.APP_NAME}}:${{env.DOCKER_TAG}}-arm64, chenweiwen/${{env.APP_NAME}}:${{env.DOCKER_TAG}}-amd64
           push: true
