@@ -1,5 +1,9 @@
 # N3N Docker
 
+[![LICENSE](https://img.shields.io/github/license/qibao07/n3n-docker?style=flat-square&label=LICENSE)](https://github.com/qibao07/n3n-docker/blob/main/LICENSE)
+[![GitHub Stars](https://img.shields.io/github/stars/qibao07/n3n-docker.svg?style=flat-square&label=Stars&logo=github)](https://github.com/qibao07/n3n-docker)
+[![Docker Stars](https://img.shields.io/docker/stars/chenweiwen/n3n-docker.svg?style=flat-square&label=Stars&logo=docker)](https://hub.docker.com/r/chenweiwen/n3n-docker)
+
 ## 使用
 
 ### 服务端
