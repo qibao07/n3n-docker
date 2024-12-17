@@ -1,12 +1,18 @@
-name: n3n-docker
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
+    inputs:
+      appVersion:
+        description: 'App version'
+        required: true
+        type: string
+      dockerTag:
+        description: 'Docker tag'
+        required: true
+        type: string
 env:
-  APP_VERSION: 3.4.4
+  APP_VERSION: ${{ inputs.appVersion }}
   APP_NAME: n3n-docker
-  DOCKER_TAG: 3.4.4
+  DOCKER_TAG: ${{ inputs.dockerTag }}
   HTTP_PROXY: ${{vars.CLASH_HTTP_PROXY}}
   HTTPS_PROXY: ${{vars.CLASH_HTTP_PROXY}}
 jobs:
