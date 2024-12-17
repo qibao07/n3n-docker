@@ -5,10 +5,12 @@ on:
         description: 'App version'
         required: true
         type: string
+        default: 3.4.4
       dockerTag:
         description: 'Docker tag'
         required: true
         type: string
+        default: 3.4.4
 env:
   APP_VERSION: ${{ inputs.appVersion }}
   APP_NAME: n3n-docker
