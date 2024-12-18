@@ -1,0 +1,29 @@
+on:
+  workflow_dispatch:
+    inputs:
+      dockerTag:
+        description: 'Docker tag'
+        required: true
+        type: string
+        default: latest
+      retryTimes:
+        description: 'Retry times'
+        required: true
+        type: number
+        default: 10
+        
+env:
+  APP_NAME: n3n-docker
+  DOCKER_TAG: ${{ inputs.dockerTag }}
+  HTTP_PROXY: ${{vars.CLASH_HTTP_PROXY}}
+  HTTPS_PROXY: ${{vars.CLASH_HTTP_PROXY}}
+jobs:
+  sync-docker-hub:
+    runs-on: ubuntu-latest
+    container:
+      image: catthehacker/ubuntu:act-latest
+    steps:
+      - name: Sync Docker Hub
+        uses: qibao07/skopeo-action@main
+        with:
+          cmd: skopeo copy --all --retry-times ${{ inputs.retryTimes }} --dest-creds chenweiwen:${{secrets.DOCKER_HUB_PASSWORD}} docker://${{vars.REGISTRY_URL}}/qibao/${{env.APP_NAME}}:${{env.DOCKER_TAG}} docker://chenweiwen/${{env.APP_NAME}}:${{env.DOCKER_TAG}}
