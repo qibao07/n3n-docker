@@ -32,12 +32,13 @@ jobs:
         with:
           driver-opts: |
             env.http_proxy=${{vars.CLASH_HTTP_PROXY}}
-            env.https_proxy=${{vars.CLASH_HTTP_PROXY}}
-      - name: Login to Docker Hub
+            env.https_proxy=${{vars.CLASH_HTTP_PROXY}}            
+      - name: Login to Registry
         uses: docker/login-action@v3
         with:
-          username: chenweiwen
-          password: ${{secrets.DOCKER_HUB_PASSWORD}}
+          registry: ${{vars.REGISTRY_URL}}
+          username: qibao
+          password: ${{secrets.REGISTRY_PASSWORD}}
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
@@ -45,7 +46,7 @@ jobs:
           platforms: linux/arm64
           push: true
           provenance: false
-          tags: chenweiwen/${{env.APP_NAME}}:${{env.DOCKER_TAG}}-arm64
+          tags: ${{vars.REGISTRY_URL}}/qibao/${{env.APP_NAME}}:${{env.DOCKER_TAG}}-arm64
           build-args: URL=https://ghproxy.net/https://github.com/n42n/n3n/releases/download/${{env.APP_VERSION}}/n3n_${{env.APP_VERSION}}-1_arm64.deb
 
   docker-build-amd64:
@@ -62,12 +63,13 @@ jobs:
         with:
           driver-opts: |
             env.http_proxy=${{vars.CLASH_HTTP_PROXY}}
-            env.https_proxy=${{vars.CLASH_HTTP_PROXY}}
-      - name: Login to Docker Hub
+            env.https_proxy=${{vars.CLASH_HTTP_PROXY}}            
+      - name: Login to Registry
         uses: docker/login-action@v3
         with:
-          username: chenweiwen
-          password: ${{secrets.DOCKER_HUB_PASSWORD}}
+          registry: ${{vars.REGISTRY_URL}}
+          username: qibao
+          password: ${{secrets.REGISTRY_PASSWORD}}
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
@@ -75,7 +77,7 @@ jobs:
           platforms: linux/amd64
           push: true
           provenance: false
-          tags: chenweiwen/${{env.APP_NAME}}:${{env.DOCKER_TAG}}-amd64
+          tags: ${{vars.REGISTRY_URL}}/qibao/${{env.APP_NAME}}:${{env.DOCKER_TAG}}-amd64
           build-args: URL=https://ghproxy.net/https://github.com/n42n/n3n/releases/download/${{env.APP_VERSION}}/n3n_${{env.APP_VERSION}}-1_amd64.deb
 
   manifest-images:
@@ -87,18 +89,40 @@ jobs:
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: chenweiwen
-          password: ${{secrets.DOCKER_HUB_PASSWORD}}
+          registry: ${{vars.REGISTRY_URL}}
+          username: qibao
+          password: ${{secrets.REGISTRY_PASSWORD}}
       - name: Create and push manifest images
         uses: noelware/docker-manifest-action@master
         with:
-          inputs: chenweiwen/${{env.APP_NAME}}:${{env.DOCKER_TAG}}
-          images: chenweiwen/${{env.APP_NAME}}:${{env.DOCKER_TAG}}-arm64, chenweiwen/${{env.APP_NAME}}:${{env.DOCKER_TAG}}-amd64
+          inputs: ${{vars.REGISTRY_URL}}/qibao/${{env.APP_NAME}}:${{env.DOCKER_TAG}}
+          images: ${{vars.REGISTRY_URL}}/qibao/${{env.APP_NAME}}:${{env.DOCKER_TAG}}-arm64, ${{vars.REGISTRY_URL}}/qibao/${{env.APP_NAME}}:${{env.DOCKER_TAG}}-amd64
           push: true
       - name: Create and push manifest images (latest)
         if: env.APP_VERSION == env.DOCKER_TAG
         uses: noelware/docker-manifest-action@master
         with:
-          inputs: chenweiwen/${{env.APP_NAME}}:latest
-          images: chenweiwen/${{env.APP_NAME}}:${{env.DOCKER_TAG}}-arm64, chenweiwen/${{env.APP_NAME}}:${{env.DOCKER_TAG}}-amd64
+          inputs: ${{vars.REGISTRY_URL}}/qibao/${{env.APP_NAME}}:latest
+          images: ${{vars.REGISTRY_URL}}/qibao/${{env.APP_NAME}}:${{env.DOCKER_TAG}}-arm64, ${{vars.REGISTRY_URL}}/qibao/${{env.APP_NAME}}:${{env.DOCKER_TAG}}-amd64
           push: true
+  sync-docker-hub:
+    runs-on: ubuntu-latest
+    container:
+      image: catthehacker/ubuntu:act-latest
+    steps:
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: chenweiwen
+          password: ${{secrets.DOCKER_HUB_PASSWORD}}
+      - name: Sync Docker Hub
+        run: |
+          docker buildx imagetools create \
+            --tag chenweiwen/${{env.APP_NAME}}:${{env.DOCKER_TAG}} \
+            ${{vars.REGISTRY_URL}}/qibao/${{env.APP_NAME}}:${{env.DOCKER_TAG}}
+      - name: Sync Docker Hub (latest)
+        if: env.APP_VERSION == env.DOCKER_TAG
+        run: |
+          docker buildx imagetools create \
+            --tag chenweiwen/${{env.APP_NAME}}:latest \
+            ${{vars.REGISTRY_URL}}/qibao/${{env.APP_NAME}}:latest
