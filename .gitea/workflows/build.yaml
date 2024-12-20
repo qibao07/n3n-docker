@@ -107,6 +107,7 @@ jobs:
           push: true
   sync-docker-hub:
     runs-on: ubuntu-latest
+    needs: [manifest-images]
     container:
       image: catthehacker/ubuntu:act-latest
     steps:
