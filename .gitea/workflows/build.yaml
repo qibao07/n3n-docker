@@ -32,7 +32,13 @@ jobs:
         with:
           driver-opts: |
             env.http_proxy=${{vars.CLASH_HTTP_PROXY}}
-            env.https_proxy=${{vars.CLASH_HTTP_PROXY}}            
+            env.https_proxy=${{vars.CLASH_HTTP_PROXY}}
+          buildkitd-config-inline: |
+            [registry."${{vars.DOCKER_MIRROR}}"]
+              http = true
+            [registry."docker.io"]
+              mirrors = ["${{vars.DOCKER_MIRROR}}"]
+              insecure = true
       - name: Login to Registry
         uses: docker/login-action@v3
         with:
@@ -63,7 +69,13 @@ jobs:
         with:
           driver-opts: |
             env.http_proxy=${{vars.CLASH_HTTP_PROXY}}
-            env.https_proxy=${{vars.CLASH_HTTP_PROXY}}            
+            env.https_proxy=${{vars.CLASH_HTTP_PROXY}}
+          buildkitd-config-inline: |
+            [registry."${{vars.DOCKER_MIRROR}}"]
+              http = true
+            [registry."docker.io"]
+              mirrors = ["${{vars.DOCKER_MIRROR}}"]
+              insecure = true
       - name: Login to Registry
         uses: docker/login-action@v3
         with:
